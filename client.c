@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     puts("Socket created");
     server.sin_addr.s_addr = inet_addr("192.168.8.187");
     server.sin_family = AF_INET;
-    server.sin_port = htons(8080);
+    server.sin_port = htons(8081);
     // Connect to remote server
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
