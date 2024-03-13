@@ -10,22 +10,29 @@
 void delay_ms(int time)
 {
     TCNT1 = 0;
-    while (!(TIFR1 & (1 << OCF1A)));
-    TIFR1 |= 1 << OCF1A;
+    int i = 0;
+    while (i < time)
+    {
+        if (TIFR1 & (1 << OCF1A))
+        {
+            i++;
+            TCNT1 = 0;
+            TIFR1 |= 1 << OCF1A;
+        }
+    }
     TCNT1 = 0;
 }
 
 int main()
 {
-    Serial.begin(9600);
-    TCCR1B |= (1 << CS10) + (1 << CS12);
-    OCR1A = 15625;
+    TCCR1B |= (1 << CS10) + (1 << CS11);
+    OCR1A = 250;
     DDRB |= 1 << LED_PIN;
     while (true)
     {
         PORTB |= 1 << LED_PIN;
-        delay_ms(1);
+        delay_ms(1000);
         PORTB = 0;
-        delay_ms(1);
+        delay_ms(500);
     }
 }
