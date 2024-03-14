@@ -6,6 +6,37 @@
 #define CS11 1
 #define CS10 0
 #define OCF1A 1
+#define BUAD 9600
+
+void initializeSerial(unsigned long buadrate)
+{
+    UBRR0 = (F_CPU / 16 / buadrate) - 1;
+    UCSR0B |= (1 << TXEN0);
+    UCSR0C = (1 << USBS0) | (3 << UCSZ00);
+}
+void serialPrintChar(unsigned char data)
+{
+    while (!(UCSR0A & (1 << UDRE0)));
+    UDR0 = data;
+}
+
+void serialPrintInt(int number)
+{
+    if (number >= 0 && number < 10)
+    {
+        serialPrintChar(number + 48);
+        return;
+    }
+    serialPrintInt(number / 10);
+    serialPrintChar((number % 10 + 48));
+}
+
+void serialPrintLn(int number)
+{
+    serialPrintInt(number);
+    while (!(UCSR0A & (1 << UDRE0)));
+    UDR0 = '\n';
+}
 
 void delay_ms(int time)
 {
@@ -44,12 +75,15 @@ void delay_us(long time)
 
 int main()
 {
-    DDRB |= 1 << LED_PIN;
+    initializeSerial(BUAD);
+    int counter = 0;
     while (true)
     {
-        PORTB |= 1 << LED_PIN;
-        delay_us(100000);
-        PORTB = 0;
-        delay_us(100000);
+       if (counter % 5 == 0)
+       {
+        serialPrintLn(counter);
+       }
+        counter++;
+        delay_ms(20);
     }
 }
